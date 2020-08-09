@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <script type="text/javascript" src="dist/jszip.js"></script>
+    <script type="text/javascript" src="dist/FileSaver.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro"></script>
+
+    <title>The pill generator</title>
+    <meta name="description" content="generate progress pills">
+    <meta name="theme-color" content="#499B4A">
+    
+</head>
+
+<html>
+    <body>
+
+    <div>
+        <div class='actionbox'>
+            <a class="heading">The pill generator</a>
+
+            <input type="text" placeholder="Main color code" name="emphasis" id="emphasis" onpaste="pillColor()" oninput="pillColor()">
+            <a class='pickerbtn' onclick="updateColor('emphasis')">🎨</a>
+
+            <input type="text" placeholder="Secondary color code" name="background" id="background" onpaste="pillColor()" oninput="pillColor()">  
+            <a class='pickerbtn' onclick="updateColor('background')">🎨</a>
+
+            <input type="number" placeholder="Width (px) def. 1024" name="width" id="width">
+            <a onclick='downloadSVG()' id='download'>Get pills</a>
+        </div>
+        <div id='pills' class='pills'>
+            <div class='dpill'>
+                <object id="pill" class="pill" type="image/svg+xml" data="pills/pill.svg"></object>
+                <object id="box" class="box" type="image/svg+xml" data="pills/box.svg"></object>
+                <object id="pill_reverse" class="pill_reverse" type="image/svg+xml" data="pills/pill_reverse.svg"></object>
+            </div>
+            <div class='lpill'>
+                <object id="pill_light" class="pill_light" type="image/svg+xml" data="pills/pill_light.svg"></object>
+                <object id="box_light" class="box_light" type="image/svg+xml" data="pills/box_light.svg"></object>
+                <object id="pill_reverse_light" class="pill_reverse_light" type="image/svg+xml" data="pills/pill_reverse_light.svg"></object>
+            </div>
+        </div>
+    </div>
+
+    <div class="wheel" id="cwhl1"></div>
+    <div class="wheel" id="cwhl2"></div>
+
+    <script>
+
+        var colorWheel = new iro.ColorPicker("#cwhl1", {
+            width: '200',
+            color: '#499b73',
+            wheelLightness: false
+        });
+
+        function updateColor(id) {
+            document.getElementById(id).value = colorWheel.color.hexString
+            pillColor()
+        }
+
+        function downloadSVG() {
+
+            let width = document.getElementById('width').value || 1024
+
+            var zip = new JSZip();
+
+            var shapes = [
+                'pill',
+                'box',
+                'pill_reverse',
+                'pill_light',
+                'box_light',
+                'pill_reverse_light'
+            ]
+
+            var zipped = 0;
+
+            for(let shape in shapes) {
+
+                let svg = document.getElementById(shapes[shape]).getSVGDocument();
+
+                let img = document.createElement('img');
+                img.id = 'img'+shape
+                img.style = `height:${width}px;width:${width}px;visibility: hidden`
+
+                let canvas = document.createElement('canvas');
+                canvas.id = 'canvas'+shape
+                canvas.height=width
+                canvas.width=width
+                canvas.style=`height:${width}px;width:${width}px`
+
+                let xml = new XMLSerializer().serializeToString(svg);
+                let svg64 = btoa(xml);
+                let b64Start = 'data:image/svg+xml;base64,';
+                let image64 = b64Start + svg64;
+                
+                img.src = image64;
+
+                img.onload = function() {
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, width);
+
+                    zip.file(`${shapes[shape]}.png`, canvas.toDataURL().replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
+                    zipped++
+
+                    if(shape == shapes.length -1) {
+                        while (zipped < shapes.length -1) {}
+                        zip.generateAsync({type:"blob"})
+                        .then(function(content) {
+                            saveAs(content, "pills.zip");
+                        });
+                    }
+
+                }
+
+            }                    
+                
+
+
+        }     
+
+        function pillColor(){
+
+            let emphasis = document.getElementById('emphasis').value || '#499b73'
+            let background = document.getElementById('background').value || '#88dbb2'
+
+            let divs = document.getElementById('pills').children
+            updatePillColors(divs[0].children, emphasis, background)
+            updatePillColors(divs[1].children, emphasis, background)
+
+        }; 
+
+        function updatePillColors(pills, emphasis, background) {
+            for (let pillnr in pills) {
+                let pill = pills[pillnr]
+                switch(pill.className) {
+                    case "pill":
+                        svg = pill.getSVGDocument();
+                            svg.getElementById('a1').style.fill = emphasis
+                            svg.getElementById('a2').style.fill = emphasis   
+                        break
+                    case "pill_light":
+                        svg = pill.getSVGDocument();
+                            svg.getElementById('a1').style.fill = background
+                            svg.getElementById('a2').style.fill = background
+                        break
+                    case "box":
+                        svg = pill.getSVGDocument();
+                            svg.getElementById('a1').style.fill = emphasis
+                        break
+                    case "box_light":
+                        svg = pill.getSVGDocument();
+                            svg.getElementById('a1').style.fill = background
+                        break
+                    case "pill_reverse":
+                        svg = pill.getSVGDocument();
+                            svg.getElementById('a1').style.fill = emphasis
+                            svg.getElementById('a2').style.fill = emphasis
+                        break
+                    case "pill_reverse_light":
+                        svg = pill.getSVGDocument();
+                            svg.getElementById('a1').style.fill = background
+                            svg.getElementById('a2').style.fill = background
+                        break
+                }
+            }
+        }
+    </script>
+    
+    </body>
+</html>

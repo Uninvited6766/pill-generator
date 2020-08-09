@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap');
+
+body {
+    background-color: #23272A;
+    font-family: 'Quicksand', sans-serif;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.pill, .pill_light, .box, .box_light, .pill_reverse, .pill_reverse_light {
+    fill: red;
+    height: 128px;
+    width: 128px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.reverse_pill {
+    margin-right: 15;
+}
+
+.pill_light {
+    margin-left: 15;
+}
+
+input, #download {
+    border-style: none;
+    background-color: #499b73;
+    color: white;
+    margin: 12px;
+    padding: 12px;
+    border-radius: 5%;
+    text-decoration: none;
+    font-family: 'Quicksand', sans-serif;
+}
+
+#download {
+    cursor: pointer;
+}
+
+.actionbox {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    
+    justify-content: center;
+    vertical-align: middle;
+    text-align: center;
+    margin-top: 300px;
+}
+
+.pickerbtn {
+    position: "absolute";
+    line-height: 62.5px;
+    font-size: 32px;
+    margin-left: -10px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.heading {
+    color: #88dbb2;
+    flex-basis: 100%;
+    font-size: 48px;
+    margin: 15px;
+}
+
+.pills {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    margin-top: 45px;
+}
+
+.dpill, .lpill {
+    display: flex;
+    margin: 15px;
+}
+
+.wheel {
+    position: absolute;
+    padding: 25px;
+    width: 200px;
+    height: 100px;
+    top: 0;
+}
